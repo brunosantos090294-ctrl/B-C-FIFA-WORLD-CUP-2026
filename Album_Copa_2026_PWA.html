@@ -1,0 +1,93 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Controle Álbum Copa 2026</title>
+<style>
+body{font-family:Arial,sans-serif;background:#0b6b3a;margin:0;padding:20px;color:#fff}
+h1{text-align:center}
+select{padding:10px;font-size:16px;width:220px}
+.card{background:#fff;color:#222;border-radius:12px;padding:15px;margin-top:15px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.item{border:1px solid #ccc;border-radius:8px;padding:8px;text-align:center}
+.item13{background:#ffe680;border:2px solid #d4a500}
+.progress{margin:10px 0;font-weight:bold}
+.small{font-size:12px;color:#555}
+</style>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b6b3a">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+
+</head>
+<body>
+<h1>Álbum Copa 2026</h1>
+
+<select id="team"></select>
+<div class="card">
+<div id="title"></div>
+<div class="progress" id="progress"></div>
+<div class="grid" id="grid"></div>
+</div>
+
+<script>
+const teams = [
+"MEX","RSA","KOR","CZE","CAN","BIH","QAT","SUI",
+"BRA","MAR","HAI","SCO","USA","PAR","AUS","TUR",
+"GER","CUW","CIV","ECU","NED","JPN","SWE","TUN",
+"BEL","EGY","IRN","NZL","ESP","CPV","KSA","URU",
+"FRA","SEN","IRQ","NOR","ARG","ALG","AUT","JOR",
+"POR","COD","UZB","COL","ENG","CRO","GHA","PAN"
+];
+
+const sel=document.getElementById('team');
+teams.forEach(t=>{
+ let o=document.createElement('option');
+ o.value=t;o.textContent=t;
+ sel.appendChild(o);
+});
+
+function key(team,num){ return team+"-"+num; }
+
+function render(){
+ const team=sel.value;
+ document.getElementById('title').innerHTML="<h2>Seleção "+team+"</h2>";
+ let done=0;
+ let html="";
+ for(let i=1;i<=20;i++){
+   const checked=localStorage.getItem(key(team,i))==="1";
+   if(checked) done++;
+   const special=i===13 ? "item13" : "";
+   const label=i===13 ? `${team} 13 (Perfilada)` : `${team} ${i}`;
+   html += `<label class="item ${special}">
+   <input type="checkbox" ${checked?"checked":""}
+   onchange="save('${team}',${i},this.checked)"><br>${label}
+   </label>`;
+ }
+ document.getElementById('grid').innerHTML=html;
+ document.getElementById('progress').textContent=`${done}/20 coladas`;
+}
+
+function save(team,num,val){
+ localStorage.setItem(key(team,num), val ? "1":"0");
+ render();
+}
+
+sel.value="BRA";
+sel.onchange=render;
+render();
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js');
+  });
+}
+</script>
+</body>
+
+</html>
